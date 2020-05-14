@@ -1,0 +1,8 @@
+INSERT INTO trz_dateferie values ('20200101','jour de lAN'), ('20200501','fete du travail'), ('20200508','victoire des allies'), ('20200714','fete nationale'), ('20200815','assomption'), ('20201101','toussaint'), ('20201111','armistice'), ('20201225','noel');
+
+-------------------------------------------------------------------------------
+
+IMPOSSIBLE DE DONNER UNE DATE FIXE:
+	- Lundi de paques
+	- Jeudi de l'ascension
+	- Lundi de pentecote

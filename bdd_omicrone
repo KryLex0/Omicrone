@@ -1,0 +1,1274 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 12.2
+-- Dumped by pg_dump version 12.2
+
+-- Started on 2020-05-06 18:07:13
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- TOC entry 233 (class 1255 OID 49410)
+-- Name: truncate_tables(text); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.truncate_tables(_username text) RETURNS void
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+   RAISE NOTICE '%', 
+   -- EXECUTE  -- dangerous, test before you execute!
+  (SELECT 'TRUNCATE TABLE '
+       || string_agg(quote_ident(schemaname) || '.' || quote_ident(tablename), ', ')
+       || ' CASCADE'
+   FROM   pg_tables
+   WHERE  tableowner = _username
+   AND    schemaname = 'public'
+   );
+END
+$$;
+
+
+ALTER FUNCTION public.truncate_tables(_username text) OWNER TO postgres;
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- TOC entry 202 (class 1259 OID 49411)
+-- Name: trz_client; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.trz_client (
+    id integer NOT NULL,
+    idcontact integer NOT NULL,
+    raison_social_client character varying(32),
+    siret_client character varying(14),
+    adresse_client character(32),
+    ville_client character(32),
+    code_postal_client integer,
+    cacher boolean DEFAULT false
+);
+
+
+ALTER TABLE public.trz_client OWNER TO postgres;
+
+--
+-- TOC entry 203 (class 1259 OID 49415)
+-- Name: trz_client_idclient_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.trz_client_idclient_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.trz_client_idclient_seq OWNER TO postgres;
+
+--
+-- TOC entry 3014 (class 0 OID 0)
+-- Dependencies: 203
+-- Name: trz_client_idclient_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.trz_client_idclient_seq OWNED BY public.trz_client.id;
+
+
+--
+-- TOC entry 204 (class 1259 OID 49417)
+-- Name: trz_commercial; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.trz_commercial (
+    idutilisateur integer NOT NULL,
+    cacher boolean DEFAULT false
+);
+
+
+ALTER TABLE public.trz_commercial OWNER TO postgres;
+
+--
+-- TOC entry 205 (class 1259 OID 49421)
+-- Name: trz_commission_idcommission_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.trz_commission_idcommission_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    MAXVALUE 2147483647
+    CACHE 1;
+
+
+ALTER TABLE public.trz_commission_idcommission_seq OWNER TO postgres;
+
+--
+-- TOC entry 206 (class 1259 OID 49423)
+-- Name: trz_commission; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.trz_commission (
+    id integer DEFAULT nextval('public.trz_commission_idcommission_seq'::regclass) NOT NULL,
+    idcommercial integer NOT NULL,
+    cacher boolean DEFAULT false
+);
+
+
+ALTER TABLE public.trz_commission OWNER TO postgres;
+
+--
+-- TOC entry 207 (class 1259 OID 49428)
+-- Name: trz_consultant; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.trz_consultant (
+    idutilisateur integer NOT NULL,
+    tarif integer,
+    cacher boolean DEFAULT false,
+    idtypecontrat integer
+);
+
+
+ALTER TABLE public.trz_consultant OWNER TO postgres;
+
+--
+-- TOC entry 208 (class 1259 OID 49432)
+-- Name: trz_contact; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.trz_contact (
+    id integer NOT NULL,
+    email1 character(32),
+    email2 character(32),
+    email3 character(32),
+    bureau integer,
+    fax integer,
+    tel3 integer,
+    cacher boolean DEFAULT false
+);
+
+
+ALTER TABLE public.trz_contact OWNER TO postgres;
+
+--
+-- TOC entry 209 (class 1259 OID 49436)
+-- Name: trz_contact_idcontact_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.trz_contact_idcontact_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.trz_contact_idcontact_seq OWNER TO postgres;
+
+--
+-- TOC entry 3015 (class 0 OID 0)
+-- Dependencies: 209
+-- Name: trz_contact_idcontact_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.trz_contact_idcontact_seq OWNED BY public.trz_contact.id;
+
+
+--
+-- TOC entry 210 (class 1259 OID 49438)
+-- Name: trz_contrat; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.trz_contrat (
+    id integer NOT NULL,
+    idclient integer NOT NULL,
+    idutilisateur integer NOT NULL,
+    date_debut_contrat date,
+    date_fin_contrat date,
+    mission_contrat text,
+    cacher boolean DEFAULT false,
+    salaire_net bigint,
+    salaire_brut bigint,
+    num_contrat bigint,
+    nom_contrat character varying(255),
+    fk_type_depense bigint
+);
+
+
+ALTER TABLE public.trz_contrat OWNER TO postgres;
+
+--
+-- TOC entry 211 (class 1259 OID 49445)
+-- Name: trz_contrat_idcontrat_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.trz_contrat_idcontrat_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.trz_contrat_idcontrat_seq OWNER TO postgres;
+
+--
+-- TOC entry 3016 (class 0 OID 0)
+-- Dependencies: 211
+-- Name: trz_contrat_idcontrat_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.trz_contrat_idcontrat_seq OWNED BY public.trz_contrat.id;
+
+
+--
+-- TOC entry 212 (class 1259 OID 49447)
+-- Name: trz_cra; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.trz_cra (
+    id integer NOT NULL,
+    idcontrat integer NOT NULL,
+    totaljfacturable_cra real,
+    totaljmaladie_cra real,
+    totaljconge_cra real,
+    astreinte_cra character varying(128),
+    periode_cra character varying(128),
+    intervention_cra character varying(128),
+    chemin text
+);
+
+
+ALTER TABLE public.trz_cra OWNER TO postgres;
+
+--
+-- TOC entry 213 (class 1259 OID 49453)
+-- Name: trz_cra_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.trz_cra_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.trz_cra_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3017 (class 0 OID 0)
+-- Dependencies: 213
+-- Name: trz_cra_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.trz_cra_id_seq OWNED BY public.trz_cra.id;
+
+
+--
+-- TOC entry 228 (class 1259 OID 73772)
+-- Name: trz_dateferie; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.trz_dateferie (
+    datejour date,
+    libelle character(32)
+);
+
+
+ALTER TABLE public.trz_dateferie OWNER TO postgres;
+
+--
+-- TOC entry 229 (class 1259 OID 98394)
+-- Name: trz_dates_contrat; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.trz_dates_contrat (
+    idutilisateur integer,
+    idcontrat integer,
+    date_min date,
+    date_max date,
+    aremplir boolean,
+    complet boolean
+);
+
+
+ALTER TABLE public.trz_dates_contrat OWNER TO postgres;
+
+--
+-- TOC entry 214 (class 1259 OID 49455)
+-- Name: trz_depense_iddepense_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.trz_depense_iddepense_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.trz_depense_iddepense_seq OWNER TO postgres;
+
+--
+-- TOC entry 215 (class 1259 OID 49457)
+-- Name: trz_depense; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.trz_depense (
+    id integer DEFAULT nextval('public.trz_depense_iddepense_seq'::regclass) NOT NULL,
+    nom_depense character(32),
+    montant_depense integer,
+    cacher boolean DEFAULT false,
+    tva_depense bigint,
+    date_depenses date
+);
+
+
+ALTER TABLE public.trz_depense OWNER TO postgres;
+
+--
+-- TOC entry 216 (class 1259 OID 49462)
+-- Name: trz_facture; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.trz_facture (
+    id integer NOT NULL,
+    idcra integer NOT NULL,
+    libelle_facture character(32),
+    montant_facture integer,
+    date_facture date,
+    quantite_facture bigint,
+    prix_ht_facture bigint,
+    tva_facture bigint
+);
+
+
+ALTER TABLE public.trz_facture OWNER TO postgres;
+
+--
+-- TOC entry 217 (class 1259 OID 49465)
+-- Name: trz_facture_idfacture_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.trz_facture_idfacture_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.trz_facture_idfacture_seq OWNER TO postgres;
+
+--
+-- TOC entry 3018 (class 0 OID 0)
+-- Dependencies: 217
+-- Name: trz_facture_idfacture_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.trz_facture_idfacture_seq OWNED BY public.trz_facture.id;
+
+
+--
+-- TOC entry 218 (class 1259 OID 49467)
+-- Name: trz_infob; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.trz_infob (
+    id integer NOT NULL,
+    idclient integer NOT NULL,
+    idcommercial integer NOT NULL,
+    codeagence character(32),
+    compte character(32),
+    iban character(32),
+    bic character(32),
+    codebanque character(32),
+    clerib integer
+);
+
+
+ALTER TABLE public.trz_infob OWNER TO postgres;
+
+--
+-- TOC entry 219 (class 1259 OID 49470)
+-- Name: trz_infob_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.trz_infob_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.trz_infob_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3019 (class 0 OID 0)
+-- Dependencies: 219
+-- Name: trz_infob_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.trz_infob_id_seq OWNED BY public.trz_infob.id;
+
+
+--
+-- TOC entry 226 (class 1259 OID 49490)
+-- Name: trz_omicrone_user; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.trz_omicrone_user (
+    id integer NOT NULL,
+    nom_user character varying(32),
+    prenom_user character varying(32),
+    adresse_user character varying(32),
+    ville_user character varying(32),
+    cp_user integer,
+    tel_user integer,
+    mail_user character varying(32),
+    username character varying(32),
+    password character varying(32)
+);
+
+
+ALTER TABLE public.trz_omicrone_user OWNER TO postgres;
+
+--
+-- TOC entry 227 (class 1259 OID 49493)
+-- Name: trz_omicrone_user_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.trz_omicrone_user_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.trz_omicrone_user_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3020 (class 0 OID 0)
+-- Dependencies: 227
+-- Name: trz_omicrone_user_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.trz_omicrone_user_id_seq OWNED BY public.trz_omicrone_user.id;
+
+
+--
+-- TOC entry 220 (class 1259 OID 49472)
+-- Name: trz_oneshot; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.trz_oneshot (
+    idcommission integer NOT NULL,
+    montant integer
+);
+
+
+ALTER TABLE public.trz_oneshot OWNER TO postgres;
+
+--
+-- TOC entry 221 (class 1259 OID 49475)
+-- Name: trz_payer; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.trz_payer (
+    idfacture integer NOT NULL,
+    idcontrat integer NOT NULL,
+    idclient integer NOT NULL
+);
+
+
+ALTER TABLE public.trz_payer OWNER TO postgres;
+
+--
+-- TOC entry 222 (class 1259 OID 49478)
+-- Name: trz_pourcentage; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.trz_pourcentage (
+    idcommission integer NOT NULL,
+    valeur integer
+);
+
+
+ALTER TABLE public.trz_pourcentage OWNER TO postgres;
+
+--
+-- TOC entry 223 (class 1259 OID 49481)
+-- Name: trz_prendre; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.trz_prendre (
+    idcontrat integer NOT NULL,
+    idcommission integer NOT NULL
+);
+
+
+ALTER TABLE public.trz_prendre OWNER TO postgres;
+
+--
+-- TOC entry 232 (class 1259 OID 114732)
+-- Name: trz_role_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.trz_role_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    MAXVALUE 2147483647
+    CACHE 1;
+
+
+ALTER TABLE public.trz_role_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 231 (class 1259 OID 98447)
+-- Name: trz_role; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.trz_role (
+    id bigint DEFAULT nextval('public.trz_role_id_seq'::regclass) NOT NULL,
+    name text
+);
+
+
+ALTER TABLE public.trz_role OWNER TO postgres;
+
+--
+-- TOC entry 230 (class 1259 OID 98444)
+-- Name: trz_role_omicrone_user; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.trz_role_omicrone_user (
+    id_user bigint NOT NULL,
+    id_role bigint NOT NULL
+);
+
+
+ALTER TABLE public.trz_role_omicrone_user OWNER TO postgres;
+
+--
+-- TOC entry 224 (class 1259 OID 49484)
+-- Name: trz_typecontrat_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.trz_typecontrat_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    MAXVALUE 2147483647
+    CACHE 1;
+
+
+ALTER TABLE public.trz_typecontrat_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 225 (class 1259 OID 49486)
+-- Name: trz_typecontrat; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.trz_typecontrat (
+    idtype integer DEFAULT nextval('public.trz_typecontrat_id_seq'::regclass) NOT NULL,
+    libelle character(32)
+);
+ALTER TABLE ONLY public.trz_typecontrat ALTER COLUMN libelle SET STORAGE PLAIN;
+
+
+ALTER TABLE public.trz_typecontrat OWNER TO postgres;
+
+--
+-- TOC entry 2788 (class 2604 OID 49495)
+-- Name: trz_client id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.trz_client ALTER COLUMN id SET DEFAULT nextval('public.trz_client_idclient_seq'::regclass);
+
+
+--
+-- TOC entry 2794 (class 2604 OID 49496)
+-- Name: trz_contact id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.trz_contact ALTER COLUMN id SET DEFAULT nextval('public.trz_contact_idcontact_seq'::regclass);
+
+
+--
+-- TOC entry 2796 (class 2604 OID 49497)
+-- Name: trz_contrat id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.trz_contrat ALTER COLUMN id SET DEFAULT nextval('public.trz_contrat_idcontrat_seq'::regclass);
+
+
+--
+-- TOC entry 2797 (class 2604 OID 49498)
+-- Name: trz_cra id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.trz_cra ALTER COLUMN id SET DEFAULT nextval('public.trz_cra_id_seq'::regclass);
+
+
+--
+-- TOC entry 2800 (class 2604 OID 49499)
+-- Name: trz_facture id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.trz_facture ALTER COLUMN id SET DEFAULT nextval('public.trz_facture_idfacture_seq'::regclass);
+
+
+--
+-- TOC entry 2801 (class 2604 OID 49500)
+-- Name: trz_infob id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.trz_infob ALTER COLUMN id SET DEFAULT nextval('public.trz_infob_id_seq'::regclass);
+
+
+--
+-- TOC entry 2803 (class 2604 OID 49501)
+-- Name: trz_omicrone_user id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.trz_omicrone_user ALTER COLUMN id SET DEFAULT nextval('public.trz_omicrone_user_id_seq'::regclass);
+
+
+--
+-- TOC entry 2978 (class 0 OID 49411)
+-- Dependencies: 202
+-- Data for Name: trz_client; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.trz_client (id, idcontact, raison_social_client, siret_client, adresse_client, ville_client, code_postal_client, cacher) FROM stdin;
+\.
+
+
+--
+-- TOC entry 2980 (class 0 OID 49417)
+-- Dependencies: 204
+-- Data for Name: trz_commercial; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.trz_commercial (idutilisateur, cacher) FROM stdin;
+1	f
+\.
+
+
+--
+-- TOC entry 2982 (class 0 OID 49423)
+-- Dependencies: 206
+-- Data for Name: trz_commission; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.trz_commission (id, idcommercial, cacher) FROM stdin;
+\.
+
+
+--
+-- TOC entry 2983 (class 0 OID 49428)
+-- Dependencies: 207
+-- Data for Name: trz_consultant; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.trz_consultant (idutilisateur, tarif, cacher, idtypecontrat) FROM stdin;
+\.
+
+
+--
+-- TOC entry 2984 (class 0 OID 49432)
+-- Dependencies: 208
+-- Data for Name: trz_contact; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.trz_contact (id, email1, email2, email3, bureau, fax, tel3, cacher) FROM stdin;
+\.
+
+
+--
+-- TOC entry 2986 (class 0 OID 49438)
+-- Dependencies: 210
+-- Data for Name: trz_contrat; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.trz_contrat (id, idclient, idutilisateur, date_debut_contrat, date_fin_contrat, mission_contrat, cacher, salaire_net, salaire_brut, num_contrat, nom_contrat, fk_type_depense) FROM stdin;
+\.
+
+
+--
+-- TOC entry 2988 (class 0 OID 49447)
+-- Dependencies: 212
+-- Data for Name: trz_cra; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.trz_cra (id, idcontrat, totaljfacturable_cra, totaljmaladie_cra, totaljconge_cra, astreinte_cra, periode_cra, intervention_cra, chemin) FROM stdin;
+\.
+
+
+--
+-- TOC entry 3004 (class 0 OID 73772)
+-- Dependencies: 228
+-- Data for Name: trz_dateferie; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.trz_dateferie (datejour, libelle) FROM stdin;
+2020-01-01	jour de lAN                     
+2020-05-01	fete du travail                 
+2020-05-08	victoire des allies             
+2020-07-14	fete nationale                  
+2020-08-15	assomption                      
+2020-11-01	toussaint                       
+2020-11-11	armistice                       
+2020-12-25	noel                            
+\.
+
+
+--
+-- TOC entry 3005 (class 0 OID 98394)
+-- Dependencies: 229
+-- Data for Name: trz_dates_contrat; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.trz_dates_contrat (idutilisateur, idcontrat, date_min, date_max, aremplir, complet) FROM stdin;
+\.
+
+
+--
+-- TOC entry 2991 (class 0 OID 49457)
+-- Dependencies: 215
+-- Data for Name: trz_depense; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.trz_depense (id, nom_depense, montant_depense, cacher, tva_depense, date_depenses) FROM stdin;
+\.
+
+
+--
+-- TOC entry 2992 (class 0 OID 49462)
+-- Dependencies: 216
+-- Data for Name: trz_facture; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.trz_facture (id, idcra, libelle_facture, montant_facture, date_facture, quantite_facture, prix_ht_facture, tva_facture) FROM stdin;
+\.
+
+
+--
+-- TOC entry 2994 (class 0 OID 49467)
+-- Dependencies: 218
+-- Data for Name: trz_infob; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.trz_infob (id, idclient, idcommercial, codeagence, compte, iban, bic, codebanque, clerib) FROM stdin;
+\.
+
+
+--
+-- TOC entry 3002 (class 0 OID 49490)
+-- Dependencies: 226
+-- Data for Name: trz_omicrone_user; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.trz_omicrone_user (id, nom_user, prenom_user, adresse_user, ville_user, cp_user, tel_user, mail_user, username, password) FROM stdin;
+0	admin	admin	admin	admin	0	0	admin	root	root
+1	Nom Commercial	PrenomCommercial	addresse commercial	ville commercial	12344	621505286	commercial@gmail.com	\N	\N
+\.
+
+
+--
+-- TOC entry 2996 (class 0 OID 49472)
+-- Dependencies: 220
+-- Data for Name: trz_oneshot; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.trz_oneshot (idcommission, montant) FROM stdin;
+\.
+
+
+--
+-- TOC entry 2997 (class 0 OID 49475)
+-- Dependencies: 221
+-- Data for Name: trz_payer; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.trz_payer (idfacture, idcontrat, idclient) FROM stdin;
+\.
+
+
+--
+-- TOC entry 2998 (class 0 OID 49478)
+-- Dependencies: 222
+-- Data for Name: trz_pourcentage; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.trz_pourcentage (idcommission, valeur) FROM stdin;
+\.
+
+
+--
+-- TOC entry 2999 (class 0 OID 49481)
+-- Dependencies: 223
+-- Data for Name: trz_prendre; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.trz_prendre (idcontrat, idcommission) FROM stdin;
+\.
+
+
+--
+-- TOC entry 3007 (class 0 OID 98447)
+-- Dependencies: 231
+-- Data for Name: trz_role; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.trz_role (id, name) FROM stdin;
+1	Admin
+2	Consultant
+3	Commercial
+\.
+
+
+--
+-- TOC entry 3006 (class 0 OID 98444)
+-- Dependencies: 230
+-- Data for Name: trz_role_omicrone_user; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.trz_role_omicrone_user (id_user, id_role) FROM stdin;
+0	1
+1	3
+\.
+
+
+--
+-- TOC entry 3001 (class 0 OID 49486)
+-- Dependencies: 225
+-- Data for Name: trz_typecontrat; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.trz_typecontrat (idtype, libelle) FROM stdin;
+1	Soustraitant                    
+2	Salarie                         
+3	Independant                     
+\.
+
+
+--
+-- TOC entry 3021 (class 0 OID 0)
+-- Dependencies: 203
+-- Name: trz_client_idclient_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.trz_client_idclient_seq', 1, false);
+
+
+--
+-- TOC entry 3022 (class 0 OID 0)
+-- Dependencies: 205
+-- Name: trz_commission_idcommission_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.trz_commission_idcommission_seq', 1, false);
+
+
+--
+-- TOC entry 3023 (class 0 OID 0)
+-- Dependencies: 209
+-- Name: trz_contact_idcontact_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.trz_contact_idcontact_seq', 1, false);
+
+
+--
+-- TOC entry 3024 (class 0 OID 0)
+-- Dependencies: 211
+-- Name: trz_contrat_idcontrat_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.trz_contrat_idcontrat_seq', 1, false);
+
+
+--
+-- TOC entry 3025 (class 0 OID 0)
+-- Dependencies: 213
+-- Name: trz_cra_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.trz_cra_id_seq', 1, false);
+
+
+--
+-- TOC entry 3026 (class 0 OID 0)
+-- Dependencies: 214
+-- Name: trz_depense_iddepense_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.trz_depense_iddepense_seq', 1, false);
+
+
+--
+-- TOC entry 3027 (class 0 OID 0)
+-- Dependencies: 217
+-- Name: trz_facture_idfacture_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.trz_facture_idfacture_seq', 1, false);
+
+
+--
+-- TOC entry 3028 (class 0 OID 0)
+-- Dependencies: 219
+-- Name: trz_infob_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.trz_infob_id_seq', 1, false);
+
+
+--
+-- TOC entry 3029 (class 0 OID 0)
+-- Dependencies: 227
+-- Name: trz_omicrone_user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.trz_omicrone_user_id_seq', 1, true);
+
+
+--
+-- TOC entry 3030 (class 0 OID 0)
+-- Dependencies: 232
+-- Name: trz_role_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.trz_role_id_seq', 1, false);
+
+
+--
+-- TOC entry 3031 (class 0 OID 0)
+-- Dependencies: 224
+-- Name: trz_typecontrat_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.trz_typecontrat_id_seq', 1, false);
+
+
+--
+-- TOC entry 2806 (class 2606 OID 49503)
+-- Name: trz_client pk_client; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.trz_client
+    ADD CONSTRAINT pk_client PRIMARY KEY (id);
+
+
+--
+-- TOC entry 2808 (class 2606 OID 49505)
+-- Name: trz_commercial pk_commercial; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.trz_commercial
+    ADD CONSTRAINT pk_commercial PRIMARY KEY (idutilisateur);
+
+
+--
+-- TOC entry 2810 (class 2606 OID 49507)
+-- Name: trz_commission pk_commission; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.trz_commission
+    ADD CONSTRAINT pk_commission PRIMARY KEY (id);
+
+
+--
+-- TOC entry 2812 (class 2606 OID 49509)
+-- Name: trz_consultant pk_consultant; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.trz_consultant
+    ADD CONSTRAINT pk_consultant PRIMARY KEY (idutilisateur);
+
+
+--
+-- TOC entry 2814 (class 2606 OID 49511)
+-- Name: trz_contact pk_contact; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.trz_contact
+    ADD CONSTRAINT pk_contact PRIMARY KEY (id);
+
+
+--
+-- TOC entry 2816 (class 2606 OID 49513)
+-- Name: trz_contrat pk_contrat; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.trz_contrat
+    ADD CONSTRAINT pk_contrat PRIMARY KEY (id);
+
+
+--
+-- TOC entry 2818 (class 2606 OID 49515)
+-- Name: trz_cra pk_cra; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.trz_cra
+    ADD CONSTRAINT pk_cra PRIMARY KEY (id);
+
+
+--
+-- TOC entry 2820 (class 2606 OID 49517)
+-- Name: trz_depense pk_depense; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.trz_depense
+    ADD CONSTRAINT pk_depense PRIMARY KEY (id);
+
+
+--
+-- TOC entry 2822 (class 2606 OID 49519)
+-- Name: trz_facture pk_facture; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.trz_facture
+    ADD CONSTRAINT pk_facture PRIMARY KEY (id);
+
+
+--
+-- TOC entry 2824 (class 2606 OID 49521)
+-- Name: trz_infob pk_infob; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.trz_infob
+    ADD CONSTRAINT pk_infob PRIMARY KEY (id);
+
+
+--
+-- TOC entry 2826 (class 2606 OID 49523)
+-- Name: trz_oneshot pk_oneshot; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.trz_oneshot
+    ADD CONSTRAINT pk_oneshot PRIMARY KEY (idcommission);
+
+
+--
+-- TOC entry 2828 (class 2606 OID 49525)
+-- Name: trz_payer pk_payer; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.trz_payer
+    ADD CONSTRAINT pk_payer PRIMARY KEY (idfacture, idcontrat, idclient);
+
+
+--
+-- TOC entry 2830 (class 2606 OID 49527)
+-- Name: trz_pourcentage pk_pourcentage; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.trz_pourcentage
+    ADD CONSTRAINT pk_pourcentage PRIMARY KEY (idcommission);
+
+
+--
+-- TOC entry 2832 (class 2606 OID 49529)
+-- Name: trz_prendre pk_prendre; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.trz_prendre
+    ADD CONSTRAINT pk_prendre PRIMARY KEY (idcontrat, idcommission);
+
+
+--
+-- TOC entry 2834 (class 2606 OID 49531)
+-- Name: trz_omicrone_user pk_utilisateur; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.trz_omicrone_user
+    ADD CONSTRAINT pk_utilisateur PRIMARY KEY (id);
+
+
+--
+-- TOC entry 2835 (class 2606 OID 49532)
+-- Name: trz_client fk_client_contact; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.trz_client
+    ADD CONSTRAINT fk_client_contact FOREIGN KEY (idcontact) REFERENCES public.trz_contact(id);
+
+
+--
+-- TOC entry 2836 (class 2606 OID 49537)
+-- Name: trz_commercial fk_commercial_utilisateur; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.trz_commercial
+    ADD CONSTRAINT fk_commercial_utilisateur FOREIGN KEY (idutilisateur) REFERENCES public.trz_omicrone_user(id);
+
+
+--
+-- TOC entry 2837 (class 2606 OID 49542)
+-- Name: trz_commission fk_commission_commercial; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.trz_commission
+    ADD CONSTRAINT fk_commission_commercial FOREIGN KEY (idcommercial) REFERENCES public.trz_commercial(idutilisateur);
+
+
+--
+-- TOC entry 2838 (class 2606 OID 49547)
+-- Name: trz_consultant fk_consultant_utilisateur; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.trz_consultant
+    ADD CONSTRAINT fk_consultant_utilisateur FOREIGN KEY (idutilisateur) REFERENCES public.trz_omicrone_user(id);
+
+
+--
+-- TOC entry 2839 (class 2606 OID 49552)
+-- Name: trz_contrat fk_contrat_client; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.trz_contrat
+    ADD CONSTRAINT fk_contrat_client FOREIGN KEY (idclient) REFERENCES public.trz_client(id);
+
+
+--
+-- TOC entry 2840 (class 2606 OID 49557)
+-- Name: trz_contrat fk_contrat_consultant; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.trz_contrat
+    ADD CONSTRAINT fk_contrat_consultant FOREIGN KEY (idutilisateur) REFERENCES public.trz_consultant(idutilisateur);
+
+
+--
+-- TOC entry 2841 (class 2606 OID 49562)
+-- Name: trz_cra fk_cra_contrat; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.trz_cra
+    ADD CONSTRAINT fk_cra_contrat FOREIGN KEY (idcontrat) REFERENCES public.trz_contrat(id);
+
+
+--
+-- TOC entry 2842 (class 2606 OID 49567)
+-- Name: trz_facture fk_facture_cra; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.trz_facture
+    ADD CONSTRAINT fk_facture_cra FOREIGN KEY (idcra) REFERENCES public.trz_cra(id);
+
+
+--
+-- TOC entry 2843 (class 2606 OID 49572)
+-- Name: trz_infob fk_infob_client; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.trz_infob
+    ADD CONSTRAINT fk_infob_client FOREIGN KEY (idclient) REFERENCES public.trz_client(id);
+
+
+--
+-- TOC entry 2844 (class 2606 OID 49577)
+-- Name: trz_infob fk_infob_commercial; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.trz_infob
+    ADD CONSTRAINT fk_infob_commercial FOREIGN KEY (idcommercial) REFERENCES public.trz_commercial(idutilisateur);
+
+
+--
+-- TOC entry 2845 (class 2606 OID 49582)
+-- Name: trz_oneshot fk_oneshot_commission; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.trz_oneshot
+    ADD CONSTRAINT fk_oneshot_commission FOREIGN KEY (idcommission) REFERENCES public.trz_commission(id);
+
+
+--
+-- TOC entry 2846 (class 2606 OID 49587)
+-- Name: trz_payer fk_payer_client; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.trz_payer
+    ADD CONSTRAINT fk_payer_client FOREIGN KEY (idclient) REFERENCES public.trz_client(id);
+
+
+--
+-- TOC entry 2847 (class 2606 OID 49592)
+-- Name: trz_payer fk_payer_contrat; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.trz_payer
+    ADD CONSTRAINT fk_payer_contrat FOREIGN KEY (idcontrat) REFERENCES public.trz_contrat(id);
+
+
+--
+-- TOC entry 2848 (class 2606 OID 49597)
+-- Name: trz_payer fk_payer_facture; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.trz_payer
+    ADD CONSTRAINT fk_payer_facture FOREIGN KEY (idfacture) REFERENCES public.trz_facture(id);
+
+
+--
+-- TOC entry 2849 (class 2606 OID 49602)
+-- Name: trz_pourcentage fk_pourcentage_commission; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.trz_pourcentage
+    ADD CONSTRAINT fk_pourcentage_commission FOREIGN KEY (idcommission) REFERENCES public.trz_commission(id);
+
+
+--
+-- TOC entry 2850 (class 2606 OID 49607)
+-- Name: trz_prendre fk_prendre_commission; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.trz_prendre
+    ADD CONSTRAINT fk_prendre_commission FOREIGN KEY (idcommission) REFERENCES public.trz_commission(id);
+
+
+--
+-- TOC entry 2851 (class 2606 OID 49612)
+-- Name: trz_prendre fk_prendre_contrat; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.trz_prendre
+    ADD CONSTRAINT fk_prendre_contrat FOREIGN KEY (idcontrat) REFERENCES public.trz_contrat(id);
+
+
+-- Completed on 2020-05-06 18:07:14
+
+--
+-- PostgreSQL database dump complete
+--
+

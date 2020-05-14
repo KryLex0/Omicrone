@@ -1,0 +1,29 @@
+do
+$$
+declare
+  l_stmt text;
+begin
+  select 'truncate ' || string_agg(format('%I.%I', schemaname, tablename), ',')
+    into l_stmt
+  from pg_tables
+  where schemaname in ('public');
+
+  execute l_stmt;
+end;
+$$
+
+-------------------------------------------------------------------------------------------
+
+ALTER SEQUENCE public.trz_client_idclient_seq RESTART;
+ALTER SEQUENCE public.trz_commission_idcommission_seq RESTART;
+ALTER SEQUENCE public.trz_contact_idcontact_seq RESTART;
+ALTER SEQUENCE public.trz_contrat_idcontrat_seq RESTART;
+ALTER SEQUENCE public.trz_cra_id_seq RESTART;
+ALTER SEQUENCE public.trz_depense_iddepense_seq RESTART;
+ALTER SEQUENCE public.trz_facture_idfacture_seq RESTART;
+ALTER SEQUENCE public.trz_infob_id_seq RESTART;
+ALTER SEQUENCE public.trz_omicrone_user_id_seq RESTART;
+ALTER SEQUENCE public.trz_role_id_seq RESTART;
+ALTER SEQUENCE public.trz_typecontrat_id_seq RESTART;
+
+-------------------------------------------------------------------------------------------

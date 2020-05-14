@@ -1,0 +1,7 @@
+format = plain
+
+
+1) Aller dans D:\Program Files\PostgreSQL\12\bin
+2) Taper cette commande dans le terminal sql:
+	psql -U <username> -d <dbname> -1 -f <filename>.sql
+	psql -U postgres -d omicrone -1 -f D:\wampserver\wamp\www\Omicrone\omicrone-commission-master\bdd_omicrone_adam.sql

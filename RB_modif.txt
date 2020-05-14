@@ -1,0 +1,12 @@
+ligne 15028
+
+
+if ( !preg_match( '/^[a-z0-9]+$/', $type ) ) {
+	throw new RedException( 'Invalid type: ' . $type );
+}
+
+/*-----------------PAR-------------------*/
+
+if ( preg_match( '/^[0-9]+$/', $type ) ) {
+	throw new RedException( 'Invalid type: ' . $type );
+}

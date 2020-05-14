@@ -1,0 +1,7 @@
+git commit -a -m "Update demande de CRA cote admin / remplissage cote consultant"
+
+-------------------------------------------------------------
+
+git add .
+git commit -m "message"
+git push -u origin master

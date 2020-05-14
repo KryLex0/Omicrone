@@ -1,0 +1,1 @@
+INSERT INTO trz_typecontrat VALUES (1,'Soustraitant'), (2,'Salarie'), (3,'Independant');

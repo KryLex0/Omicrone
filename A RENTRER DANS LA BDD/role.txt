@@ -1,0 +1,3 @@
+insert into trz_role values(1,'Admin'),(2,'Consultant'),(3,'Commercial');
+insert into trz_omicrone_user values(0,'admin','admin','admin','admin',0,0,'admin','root','root');
+insert into trz_role_omicrone_user values(0,1);
